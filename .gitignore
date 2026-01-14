@@ -43,3 +43,7 @@ yarn-error.*
 # temp files
 tsc_output*.txt
 .claude/
+
+# env
+.env.local
+.env
