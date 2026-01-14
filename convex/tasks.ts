@@ -1,6 +1,27 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
+const dayOfWeek = v.union(
+  v.literal("mon"),
+  v.literal("tue"),
+  v.literal("wed"),
+  v.literal("thu"),
+  v.literal("fri"),
+  v.literal("sat"),
+  v.literal("sun")
+);
+
+const recurrenceValidator = v.object({
+  type: v.union(
+    v.literal("none"),
+    v.literal("daily"),
+    v.literal("weekly"),
+    v.literal("biweekly"),
+    v.literal("monthly")
+  ),
+  days: v.optional(v.array(dayOfWeek)),
+});
+
 // 모든 태스크 조회
 export const list = query({
   args: {},
@@ -17,17 +38,7 @@ export const add = mutation({
     date: v.string(),
     time: v.string(),
     endTime: v.string(),
-    recurrence: v.object({
-      type: v.union(
-        v.literal("none"),
-        v.literal("daily"),
-        v.literal("weekly"),
-        v.literal("biweekly"),
-        v.literal("monthly")
-      ),
-      daysOfWeek: v.optional(v.array(v.number())),
-      endDate: v.optional(v.string()),
-    }),
+    recurrence: recurrenceValidator,
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("tasks", args);
@@ -43,19 +54,7 @@ export const update = mutation({
     date: v.optional(v.string()),
     time: v.optional(v.string()),
     endTime: v.optional(v.string()),
-    recurrence: v.optional(
-      v.object({
-        type: v.union(
-          v.literal("none"),
-          v.literal("daily"),
-          v.literal("weekly"),
-          v.literal("biweekly"),
-          v.literal("monthly")
-        ),
-        daysOfWeek: v.optional(v.array(v.number())),
-        endDate: v.optional(v.string()),
-      })
-    ),
+    recurrence: v.optional(recurrenceValidator),
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;

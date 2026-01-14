@@ -1,6 +1,16 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+const dayOfWeek = v.union(
+  v.literal("mon"),
+  v.literal("tue"),
+  v.literal("wed"),
+  v.literal("thu"),
+  v.literal("fri"),
+  v.literal("sat"),
+  v.literal("sun")
+);
+
 export default defineSchema({
   tasks: defineTable({
     title: v.string(),
@@ -16,8 +26,7 @@ export default defineSchema({
         v.literal("biweekly"),
         v.literal("monthly")
       ),
-      daysOfWeek: v.optional(v.array(v.number())),
-      endDate: v.optional(v.string()),
+      days: v.optional(v.array(dayOfWeek)),
     }),
   }),
 

@@ -2,14 +2,11 @@ import React from 'react';
 import { ConvexProvider, ConvexReactClient } from 'convex/react';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 
-const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL || '';
-const convex = convexUrl ? new ConvexReactClient(convexUrl) : null;
+// Convex URL 직접 설정
+const CONVEX_URL = 'https://enchanted-hamster-323.convex.cloud';
+const convex = new ConvexReactClient(CONVEX_URL);
 
 export default function App() {
-  if (!convex) {
-    return <DashboardScreen />;
-  }
-
   return (
     <ConvexProvider client={convex}>
       <DashboardScreen />

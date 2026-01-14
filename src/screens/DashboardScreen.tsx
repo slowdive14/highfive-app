@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import { useStore } from '../store/useStore';
+import { useConvexStore } from '../store/useConvexStore';
 import {
   TaskCard,
   DayTabs,
@@ -46,7 +46,7 @@ export const DashboardScreen: React.FC = () => {
     deleteTask,
     addTask,
     addChild,
-  } = useStore();
+  } = useConvexStore();
 
   // "Child" list now includes Parents (Subin, Songin) for scheduling purposes
   const allMembers: Child[] = [
