@@ -40,4 +40,11 @@ export default defineSchema({
       v.literal("diamond")
     ),
   }),
+
+  users: defineTable({
+    kakaoId: v.string(),
+    name: v.string(),
+    email: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+  }).index("by_kakaoId", ["kakaoId"]),
 });
