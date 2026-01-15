@@ -103,6 +103,18 @@ EXPO_PUBLIC_KAKAO_JS_KEY=your_javascript_key_here
 
 > **주의**: 설정 후 **Save** 버튼 클릭 필수!
 
+### 3.3. Vercel 환경변수 (프로덕션 배포 시)
+1. [Vercel Dashboard](https://vercel.com) 접속
+2. 프로젝트 선택 → **Settings** → **Environment Variables**
+3. 추가:
+
+| Name | Value |
+|------|-------|
+| `EXPO_PUBLIC_KAKAO_JS_KEY` | `JavaScript 키 값` |
+
+> ⚠️ **중요**: 환경변수 추가/수정 후 반드시 **Redeploy** 필요!
+> - Deployments 탭 → 최신 배포 → ⋮ 메뉴 → **Redeploy**
+
 ---
 
 ## 4. 코드 구조
@@ -137,6 +149,11 @@ project/
 ### 에러: `KAKAO_REST_API_KEY is not configured`
 **해결**: Convex Dashboard → Settings → Environment Variables → `KAKAO_REST_API_KEY` 추가 후 **Save**
 
+### 에러: `Kakao JS Key is missing in env variables`
+**해결**: 
+- 로컬: `.env.local`에 `EXPO_PUBLIC_KAKAO_JS_KEY` 추가 후 서버 재시작
+- 프로덕션: Vercel Dashboard에 환경변수 추가 후 **Redeploy**
+
 ### 에러: `redirect_uri_mismatch`
 **해결**: Kakao Developers에 정확히 `http://localhost:8081` 등록 (끝에 / 없음)
 
@@ -144,8 +161,15 @@ project/
 
 ## 배포 체크리스트
 
-- [ ] Kakao Developers에 프로덕션 도메인 등록
-- [ ] Redirect URI에 프로덕션 URL 추가
-- [ ] JavaScript SDK 도메인에 프로덕션 URL 추가
-- [ ] Convex Production 환경변수 설정
-- [ ] 클라이언트 시크릿 비활성화 상태 확인
+### Kakao Developers
+- [ ] 프로덕션 도메인을 **플랫폼 > Web > 사이트 도메인**에 등록
+- [ ] 프로덕션 URL을 **카카오 로그인 > Redirect URI**에 추가
+- [ ] 프로덕션 URL을 **플랫폼 키 > JavaScript 키 > JS SDK 도메인**에 추가
+- [ ] **클라이언트 시크릿 비활성화** 상태 확인
+
+### Convex
+- [ ] Production 환경에 `KAKAO_REST_API_KEY` 설정
+
+### Vercel
+- [ ] `EXPO_PUBLIC_KAKAO_JS_KEY` 환경변수 추가
+- [ ] 환경변수 추가 후 **Redeploy** 실행
