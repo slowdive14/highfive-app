@@ -52,31 +52,64 @@ const tasksOverlap = (task1: Task, task2: Task): boolean => {
   return start1 < end2 && end1 > start2;
 };
 
+// 겹치는 일정 그룹 및 각 일정의 위치 계산 (클러스터링 적용)
 const calculateTaskColumns = (tasks: Task[]): Map<string, { column: number; totalColumns: number }> => {
   const result = new Map<string, { column: number; totalColumns: number }>();
   if (tasks.length === 0) return result;
 
+  // 1. 시작 시간순 정렬
   const sorted = [...tasks].sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
-  const columns: Task[][] = [];
 
-  sorted.forEach((task) => {
-    let placed = false;
-    for (let col = 0; col < columns.length; col++) {
-      if (columns[col].every((t) => !tasksOverlap(t, task))) {
-        columns[col].push(task);
-        placed = true;
+  let i = 0;
+  while (i < sorted.length) {
+    // 2. 클러스터(서로 겹치는 일정 그룹) 구성
+    const cluster = [sorted[i]];
+    let clusterEnd = timeToMinutes(sorted[i].endTime) || (timeToMinutes(sorted[i].time) + 60);
+
+    let j = i + 1;
+    while (j < sorted.length) {
+      const t = sorted[j];
+      const tStart = timeToMinutes(t.time);
+
+      // 클러스터의 끝 시간보다 시작 시간이 빠르면 겹치는 그룹으로 간주
+      if (tStart < clusterEnd) {
+        cluster.push(t);
+        const tEnd = timeToMinutes(t.endTime) || (tStart + 60);
+        if (tEnd > clusterEnd) clusterEnd = tEnd;
+        j++;
+      } else {
         break;
       }
     }
-    if (!placed) columns.push([task]);
-  });
 
-  const totalColumns = columns.length;
-  columns.forEach((col, colIndex) => {
-    col.forEach((task) => {
-      result.set(task.id, { column: colIndex, totalColumns });
+    // 3. 클러스터 내부에서 컬럼 할당 (기존 로직 적용)
+    const columns: Task[][] = [];
+    cluster.forEach((task) => {
+      let placed = false;
+      for (let col = 0; col < columns.length; col++) {
+        const canPlace = columns[col].every((t) => !tasksOverlap(t, task));
+        if (canPlace) {
+          columns[col].push(task);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        columns.push([task]);
+      }
     });
-  });
+
+    // 4. 결과 저장 (해당 클러스터의 최대 컬럼 수 기준)
+    const totalColumns = columns.length;
+    columns.forEach((col, colIndex) => {
+      col.forEach((task) => {
+        result.set(task.id, { column: colIndex, totalColumns });
+      });
+    });
+
+    // 다음 클러스터로 이동
+    i = j;
+  }
 
   return result;
 };
