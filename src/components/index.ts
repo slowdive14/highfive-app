@@ -8,4 +8,5 @@ export { ViewTabs } from './ViewTabs';
 export { WeeklyView } from './WeeklyView';
 export { MonthlyView } from './MonthlyView';
 export { DailyTimeGrid } from './DailyTimeGrid';
+export { FamilyCodeModal } from './FamilyCodeModal';
 
