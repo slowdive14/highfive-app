@@ -7,7 +7,7 @@ export const Colors = {
     subin: '#8CB9BD',     // 파스텔 아쿠아 블루 (스카이블루)
     songin: '#F3B664',    // 파스텔 번트 오렌지
     sua: '#B6A6CA',       // 파스텔 퍼플
-    seungwoo: '#F1EB90',  // 파스텔 옐로우
+    seungwoo: '#A1C298',  // 파스텔 세이지 그린 (눈이 편안한 녹색)
   },
 
   // UI Colors - 파스텔 베이스
@@ -78,7 +78,7 @@ export type MemberKey = 'subin' | 'songin' | 'sua' | 'seungwoo';
 
 export const Members: Record<MemberKey, { name: string; color: string; emoji: string }> = {
   sua: { name: '수아', color: Colors.members.sua, emoji: '💜' },
-  seungwoo: { name: '승우', color: Colors.members.seungwoo, emoji: '💛' },
+  seungwoo: { name: '승우', color: Colors.members.seungwoo, emoji: '💚' },
   subin: { name: '수빈', color: Colors.members.subin, emoji: '💙' },
   songin: { name: '송인', color: Colors.members.songin, emoji: '🧡' },
 };
