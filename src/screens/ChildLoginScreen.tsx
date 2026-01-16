@@ -17,7 +17,7 @@ import { Colors, Spacing, FontSize, BorderRadius, Members, MemberKey } from '../
 export const ChildLoginScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const [code, setCode] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
-    const [familyData, setFamilyData] = useState<{ user: any; children: any[] } | null>(null);
+
 
     const convex = useConvex();
     const loginAsChild = useAuthStore((state) => state.loginAsChild);
@@ -35,8 +35,15 @@ export const ChildLoginScreen: React.FC<{ onBack: () => void }> = ({ onBack }) =
         setIsLoading(true);
         try {
             const result = await convex.query(api.users.verifyAccessCode, { code: fullCode });
-            if (result) {
-                setFamilyData(result);
+            if (result && result.children && result.children.length > 0) {
+                // Auto-login with first child found to skip selection
+                // "그냥 수아든 승우든 비번 입력하면 바로 스케줄 볼 수 있게 해"
+                loginAsChild(result.children[0]._id);
+            } else if (result && result.user) {
+                // Fallback if no specific children are linked but user found?
+                // For now alert if no children found, though schema says children linked by userId
+                Alert.alert('알림', '등록된 아이 프로필이 없습니다.');
+                setCode('');
             } else {
                 Alert.alert('오류', '올바르지 않은 코드입니다.');
                 setCode('');
@@ -52,47 +59,6 @@ export const ChildLoginScreen: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const handleDelete = () => {
         setCode((prev) => prev.slice(0, -1));
     };
-
-    const handleChildSelect = (child: any) => {
-        loginAsChild(child._id); // Using the ID from DB
-    };
-
-    if (familyData) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.profileContainer}>
-                    <Text style={styles.title}>누구세요?</Text>
-                    <Text style={styles.subtitle}>{familyData.user.name}님의 가족</Text>
-
-                    <View style={styles.grid}>
-                        {familyData.children.map((child: any) => {
-                            const memberStyle = Members[child.id as MemberKey];
-                            const color = memberStyle?.color || Colors.accent.primary;
-
-                            return (
-                                <TouchableOpacity
-                                    key={child._id}
-                                    style={[styles.profileCard, { borderColor: color }]}
-                                    onPress={() => handleChildSelect(child)}
-                                >
-                                    <View style={[styles.avatar, { backgroundColor: color }]}>
-                                        <Text style={styles.avatarEmoji}>
-                                            {memberStyle?.emoji || '👶'}
-                                        </Text>
-                                    </View>
-                                    <Text style={styles.childName}>{child.name}</Text>
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </View>
-
-                    <TouchableOpacity onPress={() => setFamilyData(null)} style={styles.backButton}>
-                        <Text style={styles.backButtonText}>다시 입력하기</Text>
-                    </TouchableOpacity>
-                </View>
-            </SafeAreaView>
-        );
-    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -210,56 +176,5 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: '600',
         color: Colors.ui.text,
-    },
-    profileContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: Spacing.lg,
-    },
-    grid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        gap: Spacing.lg,
-        marginTop: Spacing.xl,
-    },
-    profileCard: {
-        width: 140,
-        padding: Spacing.lg,
-        backgroundColor: '#FFFFFF',
-        borderRadius: BorderRadius.xl,
-        alignItems: 'center',
-        borderWidth: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
-    },
-    avatar: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: Spacing.md,
-    },
-    avatarEmoji: {
-        fontSize: 40,
-    },
-    childName: {
-        fontSize: FontSize.lg,
-        fontWeight: 'bold',
-        color: Colors.ui.text,
-    },
-    backButton: {
-        marginTop: Spacing.xl * 2,
-        padding: Spacing.md,
-    },
-    backButtonText: {
-        color: Colors.ui.textMuted,
-        fontSize: FontSize.md,
-        textDecorationLine: 'underline',
     },
 });
