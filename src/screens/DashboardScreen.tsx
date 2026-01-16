@@ -133,7 +133,7 @@ export const DashboardScreen: React.FC = () => {
         <FamilyCodeModal
           visible={familyCodeModalVisible}
           onClose={() => setFamilyCodeModalVisible(false)}
-          userId={(user as any)?._id}
+          userId={user?.id}
         />
 
         {/* ... (other modals) */}
