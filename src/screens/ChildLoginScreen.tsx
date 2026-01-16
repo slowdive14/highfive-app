@@ -35,15 +35,16 @@ export const ChildLoginScreen: React.FC<{ onBack: () => void }> = ({ onBack }) =
         setIsLoading(true);
         try {
             const result = await convex.query(api.users.verifyAccessCode, { code: fullCode });
-            if (result && result.children && result.children.length > 0) {
-                // Auto-login with first child found to skip selection
-                // "그냥 수아든 승우든 비번 입력하면 바로 스케줄 볼 수 있게 해"
-                loginAsChild(result.children[0]._id);
-            } else if (result && result.user) {
-                // Fallback if no specific children are linked but user found?
-                // For now alert if no children found, though schema says children linked by userId
-                Alert.alert('알림', '등록된 아이 프로필이 없습니다.');
-                setCode('');
+
+            // If code is valid, result.user will exist.
+            if (result && result.user) {
+                // If children are linked in DB, use the first one.
+                // If not (e.g. using default hardcoded children), use the parent's user ID as a session identifier.
+                const childId = (result.children && result.children.length > 0)
+                    ? result.children[0]._id
+                    : result.user._id;
+
+                loginAsChild(childId);
             } else {
                 Alert.alert('오류', '올바르지 않은 코드입니다.');
                 setCode('');
