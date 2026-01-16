@@ -23,9 +23,9 @@ export const ChildLoginScreen: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const loginAsChild = useAuthStore((state) => state.loginAsChild);
 
     const handleNumberPress = (num: string) => {
-        if (code.length < 6) {
+        if (code.length < 4) {
             setCode((prev) => prev + num);
-            if (code.length + 1 === 6) {
+            if (code.length + 1 === 4) {
                 verifyCode(code + num);
             }
         }
@@ -106,10 +106,10 @@ export const ChildLoginScreen: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
             <View style={styles.content}>
                 <Text style={styles.title}>접속 코드 입력</Text>
-                <Text style={styles.subtitle}>부모님 앱에서 6자리 코드를 확인하세요</Text>
+                <Text style={styles.subtitle}>부모님 앱에서 4자리 코드를 확인하세요</Text>
 
                 <View style={styles.codeDisplay}>
-                    {[0, 1, 2, 3, 4, 5].map((i) => (
+                    {[0, 1, 2, 3].map((i) => (
                         <View key={i} style={[styles.dot, code.length > i && styles.dotFilled]} />
                     ))}
                 </View>

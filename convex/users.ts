@@ -33,8 +33,8 @@ export const saveUser = mutation({
         }
     },
 });
-// Generate a random 6-digit code
-const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+// Generate a random 4-digit code
+const generateCode = () => Math.floor(1000 + Math.random() * 9000).toString();
 
 export const generateAccessCode = mutation({
     args: { userId: v.id("users") },
@@ -42,6 +42,17 @@ export const generateAccessCode = mutation({
         const code = generateCode();
         await ctx.db.patch(args.userId, { accessCode: code });
         return code;
+    },
+});
+
+export const setAccessCode = mutation({
+    args: { userId: v.id("users"), code: v.string() },
+    handler: async (ctx, args) => {
+        if (args.code.length !== 4 || isNaN(Number(args.code))) {
+            throw new Error("Code must be a 4-digit number");
+        }
+        await ctx.db.patch(args.userId, { accessCode: args.code });
+        return args.code;
     },
 });
 
