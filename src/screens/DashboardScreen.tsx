@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { useAuthStore } from '../store/useAuthStore';
 import { useConvexStore } from '../store/useConvexStore';
 import {
   TaskCard,
@@ -26,79 +27,10 @@ import { Task, ViewMode, Child } from '../types';
 import { startOfWeek, addWeeks, addMonths, format, addDays } from 'date-fns';
 
 export const DashboardScreen: React.FC = () => {
-  const [taskModalVisible, setTaskModalVisible] = useState(false);
-  const [childModalVisible, setChildModalVisible] = useState(false);
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('daily');
-  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  // ... existing state
+  const logout = useAuthStore((state) => state.logout);
 
-  const {
-    tasks,
-    children,
-    dayFilter,
-    childFilter,
-    setDayFilter,
-    setChildFilter,
-    getFilteredTasks,
-    updateTask,
-    deleteTask,
-    addTask,
-    addChild,
-  } = useConvexStore();
-
-  // "Child" list now includes Parents (Subin, Songin) for scheduling purposes
-  const allMembers: Child[] = [
-    ...children,
-    { id: 'sua', name: '수아', shape: 'star' },
-    { id: 'seungwoo', name: '승우', shape: 'triangle' },
-    { id: 'subin', name: '수빈', shape: 'circle' },
-    { id: 'songin', name: '송인', shape: 'square' },
-  ];
-
-  const handleAddTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    addTask(taskData);
-  };
-
-  const handleUpdateTask = (id: string, updates: Partial<Task>) => {
-    updateTask(id, updates);
-  };
-
-  const filteredTasks = getFilteredTasks();
-
-
-
-  const handleTaskPress = (task: Task) => {
-    setSelectedTask(task);
-    setEditModalVisible(true);
-  };
-
-  const getChildById = (childId: string) => {
-    return allMembers.find((c) => c.id === childId);
-  };
-
-  const handleDayPress = (date: Date) => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const dateStr = format(date, 'yyyy-MM-dd');
-    const todayStr = format(today, 'yyyy-MM-dd');
-    const tomorrowStr = format(tomorrow, 'yyyy-MM-dd');
-
-    if (dateStr === todayStr) {
-      setDayFilter('today');
-    } else if (dateStr === tomorrowStr) {
-      setDayFilter('tomorrow');
-    }
-    setViewMode('daily');
-  };
-
-  const sortedTasks = [...filteredTasks].sort((a, b) => a.time.localeCompare(b.time));
-  const hasChildren = allMembers.length > 0; // Always true due to parents
-
-  const memberKeys = Object.keys(Members) as MemberKey[];
+  // ... existing logic
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -111,7 +43,9 @@ export const DashboardScreen: React.FC = () => {
             <Text style={styles.headerTitle}>하이파이브</Text>
             <Text style={styles.headerSubtitle}>가족 스케줄 관리 ✋</Text>
           </View>
-
+          <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+            <Text style={styles.logoutText}>로그아웃</Text>
+          </TouchableOpacity>
         </View>
 
         {/* View Mode Tabs */}
@@ -323,5 +257,13 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xxl,
     color: '#FFFFFF',
     fontWeight: '300',
+  },
+  logoutButton: {
+    padding: Spacing.sm,
+  },
+  logoutText: {
+    fontSize: FontSize.sm,
+    color: Colors.ui.textMuted,
+    textDecorationLine: 'underline',
   },
 });
