@@ -40,9 +40,69 @@ export const DashboardScreen: React.FC = () => {
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user); // Get current User for ID
 
-  // ... (useConvexStore destructuring remains same)
+  const {
+    tasks,
+    children,
+    dayFilter,
+    childFilter,
+    setDayFilter,
+    setChildFilter,
+    getFilteredTasks,
+    updateTask,
+    deleteTask,
+    addTask,
+    addChild,
+  } = useConvexStore();
 
-  // ...
+  // "Child" list now includes Parents (Subin, Songin) for scheduling purposes
+  const allMembers: Child[] = [
+    ...children,
+    { id: 'sua', name: '수아', shape: 'star' },
+    { id: 'seungwoo', name: '승우', shape: 'triangle' },
+    { id: 'subin', name: '수빈', shape: 'circle' },
+    { id: 'songin', name: '송인', shape: 'square' },
+  ];
+
+  const handleAddTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+    addTask(taskData);
+  };
+
+  const handleUpdateTask = (id: string, updates: Partial<Task>) => {
+    updateTask(id, updates);
+  };
+
+  const filteredTasks = getFilteredTasks();
+
+  const handleTaskPress = (task: Task) => {
+    setSelectedTask(task);
+    setEditModalVisible(true);
+  };
+
+  const getChildById = (childId: string) => {
+    return allMembers.find((c) => c.id === childId);
+  };
+
+  const handleDayPress = (date: Date) => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const todayStr = format(today, 'yyyy-MM-dd');
+    const tomorrowStr = format(tomorrow, 'yyyy-MM-dd');
+
+    if (dateStr === todayStr) {
+      setDayFilter('today');
+    } else if (dateStr === tomorrowStr) {
+      setDayFilter('tomorrow');
+    }
+    setViewMode('daily');
+  };
+
+  const sortedTasks = [...filteredTasks].sort((a, b) => a.time.localeCompare(b.time));
+  const hasChildren = allMembers.length > 0; // Always true due to parents
+
+  const memberKeys = Object.keys(Members) as MemberKey[];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -73,7 +133,7 @@ export const DashboardScreen: React.FC = () => {
         <FamilyCodeModal
           visible={familyCodeModalVisible}
           onClose={() => setFamilyCodeModalVisible(false)}
-          userId={user?._id as any}
+          userId={(user as any)?._id}
         />
 
         {/* ... (other modals) */}
