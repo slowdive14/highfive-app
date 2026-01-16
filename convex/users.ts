@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 // Mutation to Create/Update User (used by kakaoLogin action)
@@ -31,5 +31,38 @@ export const saveUser = mutation({
             });
             return newUserId;
         }
+    },
+});
+// Generate a random 6-digit code
+const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+export const generateAccessCode = mutation({
+    args: { userId: v.id("users") },
+    handler: async (ctx, args) => {
+        const code = generateCode();
+        await ctx.db.patch(args.userId, { accessCode: code });
+        return code;
+    },
+});
+
+export const verifyAccessCode = query({
+    args: { code: v.string() },
+    handler: async (ctx, args) => {
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_accessCode", (q) => q.eq("accessCode", args.code))
+            .first();
+
+        if (!user) return null;
+
+        const children = await ctx.db
+            .query("children")
+            .withIndex("by_userId", (q) => q.eq("userId", user._id))
+            .collect();
+
+        return {
+            user,
+            children,
+        };
     },
 });

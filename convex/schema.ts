@@ -39,12 +39,15 @@ export default defineSchema({
       v.literal("triangle"),
       v.literal("diamond")
     ),
-  }),
+    userId: v.optional(v.string()), // Linked parent user ID
+  }).index("by_userId", ["userId"]),
 
   users: defineTable({
     kakaoId: v.string(),
     name: v.string(),
     email: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
-  }).index("by_kakaoId", ["kakaoId"]),
+    accessCode: v.optional(v.string()), // 6-digit access code for family
+  }).index("by_kakaoId", ["kakaoId"])
+    .index("by_accessCode", ["accessCode"]),
 });

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView } from 'r
 import { Colors, Spacing, FontSize, BorderRadius } from '../constants/theme';
 import { initializeKakaoSdk, loginWithKakao } from '../utils/kakaoSdk';
 
-export const LoginScreen = () => {
+export const LoginScreen: React.FC<{ onChildLogin: () => void }> = (props) => {
     useEffect(() => {
         initializeKakaoSdk();
     }, []);
@@ -27,6 +27,14 @@ export const LoginScreen = () => {
                             <Text style={styles.buttonIcon}>💬</Text>
                         </View>
                         <Text style={styles.buttonText}>카카오로 시작하기</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.childButton}
+                        onPress={props.onChildLogin}
+                        activeOpacity={0.8}
+                    >
+                        <Text style={styles.childButtonText}>아이로 시작하기</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -92,5 +100,16 @@ const styles = StyleSheet.create({
         color: '#000000',
         fontSize: FontSize.md,
         fontWeight: '600',
+    },
+    childButton: {
+        width: '100%',
+        maxWidth: 300,
+        paddingVertical: 14,
+        alignItems: 'center',
+    },
+    childButtonText: {
+        color: Colors.ui.textMuted,
+        fontSize: FontSize.md,
+        textDecorationLine: 'underline',
     },
 });

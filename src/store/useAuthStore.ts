@@ -14,7 +14,10 @@ interface User {
 interface AuthState {
     user: User | null;
     isAuthenticated: boolean;
+    selectedChildId: string | null; // For child mode
+    isChildMode: boolean;
     login: (user: User) => void;
+    loginAsChild: (childId: string) => void;
     logout: () => void;
 }
 
@@ -58,8 +61,11 @@ export const useAuthStore = create<AuthState>()(
         (set) => ({
             user: null,
             isAuthenticated: false,
-            login: (user) => set({ user, isAuthenticated: true }),
-            logout: () => set({ user: null, isAuthenticated: false }),
+            selectedChildId: null,
+            isChildMode: false,
+            login: (user) => set({ user, isAuthenticated: true, isChildMode: false, selectedChildId: null }),
+            loginAsChild: (childId) => set({ isAuthenticated: true, isChildMode: true, selectedChildId: childId }),
+            logout: () => set({ user: null, isAuthenticated: false, isChildMode: false, selectedChildId: null }),
         }),
         {
             name: 'highfive-auth-storage',
